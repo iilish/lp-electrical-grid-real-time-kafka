@@ -1,0 +1,12 @@
+{"namespace": "com.manning.energy.battery.generated",
+ "type": "record",
+ "name": "DeviceEventRow",
+ "fields": [
+     {"name": "deviceId", "type": "string"},
+     {"name": "charging",  "type": "int"},
+     {"name": "chargingSource", "type": ["null", "string"]},
+     {"name": "currentCapacity", "type": ["null", "long" ]},
+     {"name": "inverterState", "type": ["null",  "int"]},
+     {"name": "soCRegulator", "type": ["null", "float"]}
+ ]
+}

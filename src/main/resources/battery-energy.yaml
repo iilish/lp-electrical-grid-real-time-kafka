@@ -1,0 +1,108 @@
+--- #Battery Energy REST configuration file
+#  docker exec -it <<container name>> bash
+#
+#Kafka brokers configuration
+# kafka-topics --list --bootstrap-server localhost:29092
+# kafka-topics --create --bootstrap-server localhost:29092 --replication-factor 1 --partitions 3 --topic energyTopic
+# kafka-topics --create --bootstrap-server localhost:29092 --replication-factor 1 --partitions 3 --topic energyTransformedTopic
+# kafka-console-consumer --bootstrap-server localhost:29092 \
+#    --topic energyTopic \
+#    --from-beginning \
+#    --formatter kafka.tools.DefaultMessageFormatter \
+#    --property print.key=true \
+#    --property print.value=true \
+#    --property key.deserializer=org.apache.kafka.common.serialization.StringDeserializer \
+#    --property value.deserializer=io.confluent.kafka.serializers.KafkaAvroDeserializerConfig
+#
+#  kafka-console-consumer --bootstrap-server localhost:29092 --topic energyTransformedTopic --formatter kafka.tools.DefaultMessageFormatter --property print.key=true --property print.value=true
+kafka:
+  serversUrl: localhost:29092
+  schemaRegistryUrl: http://localhost:8090
+
+#Energy Battery Kafka topic
+energyTopicNameIn: energyTopic
+energyTopicNameOut: energyTransformedTopic
+
+# Logging settings.
+logging:
+
+  # The default level of all loggers. Can be OFF, ERROR, WARN, INFO, DEBUG, TRACE, or ALL.
+  level: INFO
+
+  # Logger-specific levels.
+  loggers:
+
+    # Overrides the level of com.example.dw.Thing and sets it to DEBUG.
+    "com.example.dw.Thing": DEBUG
+
+    # Enables the SQL query log and redirect it to a separate file
+    "org.hibernate.SQL":
+      level: DEBUG
+      # This line stops org.hibernate.SQL (or anything under it) from using the root logger
+      additive: false
+      appenders:
+        - type: file
+          currentLogFilename: ./logs/example-sql.log
+          archivedLogFilenamePattern: ./logs/example-sql-%d.log.gz
+          archivedFileCount: 5
+  appenders:
+    # Log warnings and errors to stderr
+    - type: console
+      threshold: DEBUG
+     # target: stderr
+
+    - type: file
+      # The file to which current statements will be logged.
+      currentLogFilename: ./logs/energy-battery.log
+
+      # When the log file rotates, the archived log will be renamed to this and gzipped. The
+      # %d is replaced with the previous day (yyyy-MM-dd). Custom rolling windows can be created
+      # by passing a SimpleDateFormat-compatible format as an argument: "%d{yyyy-MM-dd-hh}".
+      archivedLogFilenamePattern: ./logs/energy-battery-%d.log.gz
+
+      # The number of archived files to keep.
+      archivedFileCount: 5
+
+      # The timezone used to format dates. HINT: USE THE DEFAULT, UTC.
+      timeZone: UTC
+
+database:
+  # the name of your JDBC driver
+  driverClass: org.postgresql.Driver
+
+  # the username
+  user: postgres
+
+  # the password
+  password: secret
+
+  # the JDBC URL
+  url: jdbc:postgresql://localhost:5432/postgres
+
+  # any properties specific to your JDBC driver:
+  properties:
+    charSet: UTF-8
+
+  # the maximum amount of time to wait on an empty pool before throwing an exception
+  maxWaitForConnection: 1s
+
+  # the SQL query to run when validating a connection's liveness
+  validationQuery: "/* MyService Health Check */ SELECT 1"
+
+  # the timeout before a connection validation queries fail
+  validationQueryTimeout: 3s
+
+  # the minimum number of connections to keep open
+  minSize: 8
+
+  # the maximum number of connections to keep open
+  maxSize: 32
+
+  # whether or not idle connections should be validated
+  checkConnectionWhileIdle: false
+
+  # the amount of time to sleep between runs of the idle connection validation, abandoned cleaner and idle pool resizing
+  evictionInterval: 10s
+
+  # the minimum amount of time an connection must sit idle in the pool before it is eligible for eviction
+  minIdleTime: 1 minute
